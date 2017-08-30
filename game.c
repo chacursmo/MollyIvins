@@ -31,24 +31,31 @@ int main(){
 
   do {
     experimentGen();
-    printf("1\n");
+    //    printf("1\n");
     performanceSys();
-    printf("2\n");
+    //    printf("2\n");
+    printf("After a performance the board looks like\n");
+    int i;
+    for (i = 0; i < MAG; ++i){
+      printf("%d ",Board[i]);
+    }
+    putchar('\n');
     critic();
-    printf("3\n");
+    //    printf("3\n");
     generalizer();
-    printf("4\n");
+    //    printf("4\n");
     epsilon++;
-    printf("%d\n",epsilon);
-  } while (epsilon < 1);
+    //    printf("%d\n",epsilon);
+   } while (epsilon < 1);
   return 0;
 }
 
 void experimentGen(){
   int i,j;
   for ( i = 0; i < MAG; ++i){
-    Board[i]=0;
-    Trace[i]=-1;
+    Board[i]=0; //Zero Represents a blank Board
+    Trace[i]=-1; //-1 Means nothing has happended yet,
+    //Trace is populated by a number zero thru eight representing valid move
   }
 
   for ( i =0; i < MAG; ++i){
@@ -75,28 +82,29 @@ void performanceSys(){
 
   do {
     move(1);
+    
     if (isWinner()){
-      Score = 100;
-      printf("1 W\n");
+            Score = 100;
+	    //      printf("1 W\n");
       break;
     } else if (isDraw()){
-      printf("1 D\n");
+      //      printf("1 D\n");
       Score = 0;
       break;
     }
-    printf("1.1\n");
+    //    printf("1.1\n");
     
     move(-1);
     if (isWinner()){
       Score = -100;
-      printf("2 W\n");
+      //      printf("2 W\n");
       break;
     } else if (isDraw()){
-      printf("2 D\n");      
+      //      printf("2 D\n");      
       Score = 0;
       break;
     }
-        printf("1.2\n");
+    //        printf("1.2\n");
   } while (1);
 }
 
@@ -109,19 +117,18 @@ void move(int p){
   max_v = 0;
   for (i = 0; i < MAG; ++i){
 
-
     if (!Board[i]){
       aux = v_hat(i,p);
-      printf("aux:%f \n",aux);
+      //      printf("aux:%f \n",aux);
       if (max_v < aux){
 	max_v = aux;
 	max_i = i;
-	printf("i%d\n",i);
+	//	printf("i%d\n",i);
       }
     }
   }
 
-  printf("max_i:%d \n",max_i);
+  //  printf("max_i:%d \n",max_i);
   /*
         for (i = 0; i < MAG; ++i){
 	printf("%d ",Board[i]);
@@ -140,17 +147,19 @@ void move(int p){
       //      Board[8] = -1;
       
 	      //    getchar();
-      
-          Board[max_i]=p;
+  printf("The Move function has decided for player %d\n",p);
+  printf("The best move to be %d.\n",max_i);
+  Board[max_i]=p;
+  
+
+  //All subsequent moves are set 
   for (u = 0; u < MAG; ++u){
-    if( Trace[u] != -1 ){
+    if( Trace[u] == -1 ){
       Trace[u] = max_i;
       break;
     }
   }
 }
-
-
 
 
 float v_hat(int m,int p){
@@ -212,13 +221,14 @@ int isWinner(){
   return 0;
 }
 
-
 int isDraw(){
   int i;
-  printf("draw\n");
+  //  printf("draw\n");
+  /*
   for (i = 0; i < MAG; ++i){
     printf("%d ",Board[i]);
   }
+  */
   for (i = 0; i < MAG; ++i){
     if (!Board[i]){
       return 0;
@@ -228,12 +238,19 @@ int isDraw(){
 }
 
   
-  
 void critic(){
+
   int i,j;
+  printf("We have reached the critic\n");
+  printf("Status of game trace\n");
   for ( i = 0; i < MAG; ++i){
-    for (j = 0; j < i; ++j){
-	if (j%2){
+    printf("%d ",Trace[i]);
+  }
+  putchar('\n');
+
+  for ( i = 0; i < MAG; ++i){
+    for (j = 0; j <= i; ++j){
+      if (!(j%2)){
 	  BoardHistory[i][Trace[j]]=1;
 	} else {
 	  BoardHistory[i][Trace[j]]=-1;
@@ -245,10 +262,15 @@ void critic(){
 
 
 float V_hat_2(int b[]){
-
+  int i;
   int X[(MAG * 2) + 1];
   X[0]=1;
-  int i;
+  for ( i = 1; i < (2 * MAG) + 1; ++i){
+    X[i] = 0;
+  }
+  
+  
+
   float result;
   result = 0.0;
   for (i = 0 ; i < (MAG * 2) + 1; ++i){
@@ -261,6 +283,13 @@ void generalizer(){
   int i,j,k;
   float temp;
   int X[MAG][(MAG*2)+1];
+
+  for (i = 0; i < MAG; ++i){
+    for ( j = 0; j < (2 * MAG) + 1; ++j){
+      X[i][j]=0;
+    }
+  }
+  
   for (i = 0; i < MAG; ++i){
     X[i][0]=1;
     for (j = 0; j < MAG; ++j){
@@ -283,16 +312,46 @@ void generalizer(){
   }
   */
       
-  nu = 0;
-  
-  for ( i = 0; i < MAG; ++i){
-    for ( j = 0; j < MAG; ++j){
-      for ( k = 0; k < ( 2 * MAG ) + 1; ++k){
-	temp = (V_train[j] - V_hat_2(BoardHistory[j])) * X[j][k];
-	Weights[k] = Weights[k] + nu * temp;
-      }
+  nu = 0.0001;
+
+  printf("We have reached Generalizer\n");
+  printf("Status of BoardHistory\n");
+  for (i = 0; i < MAG; ++i){
+    for (j = 0; j < MAG; ++j){
+      printf("%d ",BoardHistory[i][j]);
     }
+    putchar('\n');
   }
+
+  printf("V_train.\n");
+  for (i = 0; i < MAG; ++i){
+    printf("%d ",V_train[i]);
+  }
+  putchar('\n');
+
+  printf("Status of X vector\n");
+  for (i = 0; i < MAG; ++i){
+    for (j = 0;j < (2 * MAG) + 1; ++j){
+      printf("%d ",X[i][j]);
+    }
+    putchar('\n');
+  }
+  
+  for ( j = 0; j < MAG; ++j){
+    for ( k = 0; k < ( 2 * MAG ) + 1; ++k){
+      
+      temp = (V_train[j] - V_hat_2(BoardHistory[j])) * X[j][k];
+      //      printf("te: %f \n",temp);
+      Weights[k] = Weights[k] + (nu * temp);
+      //      printf("W_k: %f \n",Weights[k]);
+    }
+    printf("Weights after %d Loop\n",j+1);
+    for (i = 0; i < (2 * MAG) + 1; ++i){
+      printf("%f ",Weights[i]);
+    }
+    putchar('\n');
+  }
+
 
   FILE *fp;
   fp = fopen("weights.txt","w+");
