@@ -11,6 +11,7 @@ void generalizer();
 
 //Game Play Functions
 void move(int);
+void move_2();
 int isWinner();
 int isDraw();
 float v_hat(int,int);
@@ -21,7 +22,6 @@ int epsilon;
 int Board[MAG];
 float Weights[(MAG*2)+1];
 int Trace[MAG];
-int Score;
 int BoardHistory[MAG][MAG];
 int V_train[MAG];
 float nu;
@@ -30,23 +30,40 @@ int main(){
   epsilon = 0;
 
   do {
+    printf("a\n");
     experimentGen();
     //    printf("1\n");
+    printf("b\n");
     performanceSys();
+    printf("c\n");
     //    printf("2\n");
+    /*
     printf("After a performance the board looks like\n");
     int i;
     for (i = 0; i < MAG; ++i){
       printf("%d ",Board[i]);
     }
+
     putchar('\n');
+    */
+    int i;
+    for (i = 0; i < MAG; ++i){
+      if (!(i % 3)){
+	putchar('\n');
+      }
+      printf("%2d ",Board[i]);
+    }
+    putchar('\n');
+      
     critic();
+    printf("d\n");
     //    printf("3\n");
     generalizer();
+    printf("e\n");
     //    printf("4\n");
     epsilon++;
     //    printf("%d\n",epsilon);
-   } while (epsilon < 1);
+   } while (epsilon < 10);
   return 0;
 }
 
@@ -81,33 +98,109 @@ void experimentGen(){
 void performanceSys(){
 
   do {
+    printf("1\n");
     move(1);
-    
+        printf("2\n");
     if (isWinner()){
-            Score = 100;
-	    //      printf("1 W\n");
+
+	          printf("1 W\n");
       break;
     } else if (isDraw()){
-      //      printf("1 D\n");
-      Score = 0;
+        printf("1 D\n");
       break;
     }
     //    printf("1.1\n");
-    
+
     move(-1);
+        printf("3\n");
     if (isWinner()){
-      Score = -100;
-      //      printf("2 W\n");
+           printf("2 W\n");
       break;
     } else if (isDraw()){
-      //      printf("2 D\n");      
-      Score = 0;
+           printf("2 D\n");      
       break;
     }
     //        printf("1.2\n");
+    int i;
+    for ( i = 0; i < MAG; ++i){
+      printf("%d ",Board[i]);
+    }
+    putchar('\n');
   } while (1);
 }
+void move_2(){
+  int move;
 
+  move = -1;
+  if (( Board[0] == 1) && ( Board[6] == 1)){
+    move = 3;
+  } else if ((Board[0] == 1) && ( Board[2] == 1 )){
+    move = 1;
+  } else if ((Board[0] == 1) && ( Board[8] == 1)){
+    move = 4;
+  } else if ((Board[0] == 1) && ( Board[1] == 1)){
+    move = 2;
+  } else if ((Board[0] == 1) && ( Board[3] == 1)){
+    move = 6;
+  } else if ((Board[0] == 1) && ( Board[4] == 1)){
+    move = 8;
+  } else if ((Board[1] == 1) && ( Board[2] == 1)){
+    move = 0;
+  } else if ((Board[1] == 1) && ( Board[4] == 1)){
+    move = 7;
+  } else if ((Board[1] == 1) && ( Board[7] == 1)){
+    move = 4;
+  } else if ((Board[2] == 1) && ( Board[5] == 1)){
+    move = 8;
+  } else if ((Board[2] == 1) && ( Board[8] == 1)){
+    move = 5;
+  } else if ((Board[3] == 1) && ( Board[6] == 1)){
+    move = 0;
+  } else if ((Board[3] == 1) && ( Board[4] == 1)){
+    move = 5;
+  } else if ((Board[3] == 1) && ( Board[5] == 1)){
+    move = 4;
+  } else if ((Board[4] == 1) && ( Board[8] == 1)){
+    move = 0;
+  } else if ((Board[4] == 1) && ( Board[7] == 1)){
+    move = 1;
+  } else if ((Board[4] == 1) && ( Board[6] == 1)){
+    move = 2;
+  } else if ((Board[4] == 1) && ( Board[5] == 1)){
+    move = 3;
+  } else if ((Board[5] == 1) && ( Board[8] == 1)){
+    move = 2;
+  } else if ((Board[6] == 1) && ( Board[7] == 1)){
+    move = 8;
+  } else if ((Board[6] == 1) && ( Board[8] == 1)){
+    move = 7;
+  } else if ((Board[7] == 1) && ( Board[8] == 1)){
+    move = 6;
+  } else if (!Board[0]){
+    move = 0;
+  } else if (!Board[2]){
+    move = 2;
+  } else if (!Board[4]){
+    move = 4;
+  } else if (!Board[6]){
+    move = 6;
+  } else if (!Board[8]){
+    move = 8;
+  }
+  if (move > 0){  
+
+    Board[move]=1;
+    int u;
+    for (u = 0; u < MAG; ++u){
+      if( Trace[u] == -1 ){
+	Trace[u] = move;
+	break;
+      }
+    }
+  } else {
+    printf("Error in move\n");
+  }
+}
 
 void move(int p){
   int i,u;
@@ -119,7 +212,7 @@ void move(int p){
 
     if (!Board[i]){
       aux = v_hat(i,p);
-      //      printf("aux:%f \n",aux);
+      printf("aux:%f \n",aux);
       if (max_v < aux){
 	max_v = aux;
 	max_i = i;
@@ -147,8 +240,11 @@ void move(int p){
       //      Board[8] = -1;
       
 	      //    getchar();
+  /*
   printf("The Move function has decided for player %d\n",p);
   printf("The best move to be %d.\n",max_i);
+  */
+  printf("max_i: %d \n",max_i);
   Board[max_i]=p;
   
 
@@ -163,6 +259,17 @@ void move(int p){
 
 
 float v_hat(int m,int p){
+  int B[MAG];
+  int i;
+  for (i = 0; i < MAG; ++i){
+    B[i]=Board[i];
+  }
+
+  B[m]=p;
+
+  return v_hat_2(B);
+
+  /*
   float V;
   int i;
   int len;
@@ -188,6 +295,7 @@ float v_hat(int m,int p){
     V+=Weights[i+1]*X[i];
   }
   return V;
+  */
 }
 
 int isWinner(){
@@ -221,6 +329,37 @@ int isWinner(){
   return 0;
 }
 
+int isWinner_2(int B[]){
+  if (B[0]){
+    if ((B[0] == B[1]) && ( B[1] == B[2])){
+      return 1;
+    } else if ((B[0] == B[3]) && ( B[3] == B[6])){
+      return 1;
+    } else if ((B[0] == B[4]) && ( B[4] == B[8])){
+      return 1;
+    }
+  } else if (B[1]){
+    if ((B[1] == B[4]) && ( B[4] == B[7])){
+      return 1;
+    }
+  } else if (B[2]){
+    if (( B[2] == B[4]) && (B[4] == B[6])){
+      return 1;
+    } else if ((B[2] == B[5] ) && (B[5] == B[8])){
+      return 1;
+    }
+  } else if (B[3]){
+    if ((B[3] == B[4]) && (B[4] == B[5])){
+      return 1;
+    }
+  } else if (B[6]){
+    if ((B[6] == B[7]) && (B[7] == B[8])){
+      return 1;
+    }
+  }
+  return 0;
+}
+
 int isDraw(){
   int i;
   //  printf("draw\n");
@@ -237,17 +376,34 @@ int isDraw(){
   return 1;
 }
 
-  
-void critic(){
+int isDraw_2(int B[]){
+  int i;
+  //  printf("draw\n");
+  /*
+  for (i = 0; i < MAG; ++i){
+    printf("%d ",Board[i]);
+  }
+  */
+  for (i = 0; i < MAG; ++i){
+    if (!B[i]){
+      return 0;
+    }
+  }
+  return 1;
+}
 
+
+void critic(){
   int i,j;
+  /*
   printf("We have reached the critic\n");
   printf("Status of game trace\n");
+
   for ( i = 0; i < MAG; ++i){
     printf("%d ",Trace[i]);
   }
   putchar('\n');
-
+  */
   for ( i = 0; i < MAG; ++i){
     for (j = 0; j <= i; ++j){
       if (!(j%2)){
@@ -261,7 +417,14 @@ void critic(){
 }
 
 
-float V_hat_2(int b[]){
+float v_hat_2(int b[]){
+  if (isWinner_2(b)){
+    return 100.0;
+  } else if (isDraw_2(b)){
+    return 0.0;
+  }
+  
+
   int i;
   int X[(MAG * 2) + 1];
   X[0]=1;
@@ -313,7 +476,7 @@ void generalizer(){
   */
       
   nu = 0.0001;
-
+  /*
   printf("We have reached Generalizer\n");
   printf("Status of BoardHistory\n");
   for (i = 0; i < MAG; ++i){
@@ -336,20 +499,21 @@ void generalizer(){
     }
     putchar('\n');
   }
-  
+  */
   for ( j = 0; j < MAG; ++j){
     for ( k = 0; k < ( 2 * MAG ) + 1; ++k){
       
-      temp = (V_train[j] - V_hat_2(BoardHistory[j])) * X[j][k];
+      temp = (V_train[j] - v_hat_2(BoardHistory[j])) * X[j][k];
       //      printf("te: %f \n",temp);
       Weights[k] = Weights[k] + (nu * temp);
       //      printf("W_k: %f \n",Weights[k]);
     }
-    printf("Weights after %d Loop\n",j+1);
+    /*    printf("Weights after %d Loop\n",j+1);
     for (i = 0; i < (2 * MAG) + 1; ++i){
       printf("%f ",Weights[i]);
     }
     putchar('\n');
+    */
   }
 
 
