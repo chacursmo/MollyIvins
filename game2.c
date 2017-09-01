@@ -16,6 +16,7 @@ int draw();
 int main(){
 
   int result = playGame();
+  
   if (result == 1){
     printf("You Win!\n");
   } else if (result == 0){
@@ -23,6 +24,7 @@ int main(){
   } else {
     printf("Computer Wins.\n");
   }
+  printBoard();
   return 0;
 }
 
@@ -44,7 +46,12 @@ int playGame(){
     //also error checking for move
     if ( coin == flip) {
       printBoard();
-      scanf("%d",&m);
+      do {
+	scanf("%d",&m);
+	if (Board[m]){
+	  printf("Invalid Move.\n");
+	}
+      } while (Board[m]);
       Board[m]=1;
       if (winner()){
 	goto endGame;
@@ -54,7 +61,7 @@ int playGame(){
       m = computerTurn();
       Board[m]=-1;
       if (winner()){
-	goto endGame;
+	goto computerWins;
       } else if (draw()){
 	goto endGame;
       }
@@ -62,13 +69,18 @@ int playGame(){
       m = computerTurn();
       Board[m]=-1;
       if (winner()){
-	goto endGame;
+	goto computerWins;
       } else if (draw()){
 	goto endGame;
       }
       printBoard();
-      scanf("%d",&m);
-      Board[m]=1;
+      do {
+	scanf("%d",&m);
+	if (Board[m]){
+	  printf("Invalid Move.\n");
+	}
+      } while (Board[m]);
+	Board[m]=1;
       if (winner()){
 	goto endGame;
       } else if (draw()){
@@ -80,6 +92,8 @@ int playGame(){
   return status;
  endGame: status = getStatus();
   return status;
+ computerWins:
+  return 2;
 }
 
 int winner(){
@@ -100,7 +114,8 @@ int getStatus(){
     } else if ((Board[0] == Board[4]) && (Board[4] == Board[8])){
       return 1;
     }
-  }else if(Board[4]){
+  }
+  if(Board[4]){
     if ((Board[3] == Board[4]) && (Board[4] == Board[5])){
       return 1;
     } else if ((Board[1] == Board[4]) && (Board[4] == Board[7])){
@@ -108,7 +123,8 @@ int getStatus(){
     } else if ((Board[2] == Board[4]) && (Board[4] == Board[6])){
       return 1;
     }
-  } else if(Board[8]){
+  }
+  if(Board[8]){
     if ((Board[6] == Board[7]) && (Board[7] == Board[8])){
       return 1;
     } else if ((Board[2] == Board[5]) && (Board[5] == Board[8])){
@@ -116,7 +132,7 @@ int getStatus(){
     }
   }
   for (i = 0 ; i < S; ++i){
-    if (Board[i]){
+    if (!Board[i]){
       return 10;
     }
   }
