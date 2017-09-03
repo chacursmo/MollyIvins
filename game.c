@@ -19,6 +19,9 @@ int isWinner();
 int isDraw();
 float v_hat(int,int);
 float v_hat_2(int []);
+void printBoard();
+int logicTurn();
+void makeMove(int);
 
 //Global Variables
 int epsilon;
@@ -28,17 +31,39 @@ int Trace[MAG];
 int BoardHistory[MAG][MAG];
 int V_train[MAG];
 float nu;
+int whom;
 
 int main(){
-  epsilon = 0;
+  putchar('2');
+  int logic,learning,dven;
 
+  logic = 0;
+  learning = 0;
+  dven = 0;
+  
+  epsilon = 0;
   do {
     //    printf("a\n");
     experimentGen();
     //    printf("1\n");
     //    printf("b\n");
     performanceSys();
-    //    printf("c\n");
+    switch(whom){
+    case 1:
+      logic++;
+      break;
+    case -1:
+      learning++;
+      break;
+    case 0:
+      dven++;
+      break;
+    default:
+      printf("Error in main.\n");
+    }
+	
+    //    printBoard();
+	//    printf("c\n");
     //    printf("2\n");
     /*
     printf("After a performance the board looks like\n");
@@ -49,26 +74,40 @@ int main(){
 
     putchar('\n');
     */
-    int i;
-    for (i = 0; i < MAG; ++i){
-      if (!(i % 3)){
-	putchar('\n');
-      }
-           printf("%2d ",Board[i]);
-    }
-    putchar('\n');
-      
-    critic();
+        printBoard();
+        critic();
     //    printf("d\n");
     //    printf("3\n");
-    generalizer();
+        generalizer();
     //    printf("e\n");
     //    printf("4\n");
     epsilon++;
     //    printf("%d\n",epsilon);
-   } while (epsilon < 10);
+   } while (epsilon < 3);
+  printf("ML %d,Logic %d, Draw %d\n",learning,logic,dven);
   return 0;
 }
+
+void printBoard(){
+  int i;
+    for (i = 0; i < MAG; ++i){
+      if (!(i % 3)){
+	putchar('\n');
+      }
+      switch(Board[i]){
+      case 1:
+	putchar('X');
+	break;
+      case -1:
+	putchar('O');
+	break;
+      default:
+	putchar('-');
+      }
+    }
+    putchar('\n');
+}
+
 
 void experimentGen(){
   int i,j;
@@ -100,41 +139,178 @@ void experimentGen(){
 
 void performanceSys(){
 
+
+  whom = 0;
+  srand(time(NULL));
+  int flip,m;
+  flip = (rand()%2);
+  
   do {
-    //    printf("1\n");
-    move(1);
-    
-    //        printf("2\n");
-    if (isWinner()){
-
-      //	          printf("1 W\n");
-      break;
-    } else if (isDraw()){
-      //        printf("1 D\n");
-      break;
+    if (flip){
+      makeMove(logicTurn());
+      if (isWinner()){
+	whom = 1;
+	goto theEnd;
+      } else if (isDraw()){
+	goto theEnd;
+      }
+      move(1);
+      if (isWinner()){
+	whom = -1;
+	goto theEnd;
+      } else if (isDraw()){
+	goto theEnd;
+      }
+    } else {
+      move(1);
+      if (isWinner()){
+	whom = -1;
+	goto theEnd;
+      } else if (isDraw()){
+	goto theEnd;
+      }
+      makeMove(logicTurn());
+      if (isWinner()){
+	whom = 1;
+	goto theEnd;
+      } else if (isDraw()){
+	goto theEnd;
+      }
     }
-    //    printf("1.1\n");
-
-    move(-1);
-    //        printf("3\n");
-    if (isWinner()){
-      //           printf("2 W\n");
-      break;
-    } else if (isDraw()){
-      //           printf("2 D\n");      
-      break;
-    }
-    //        printf("1.2\n");
-    /*    int i;
-    for ( i = 0; i < MAG; ++i){
-      printf("%d ",Board[i]);
-    }
-    putchar('\n');
-    */
   } while (1);
-
+ theEnd: return;
+  
   
 }
+
+void makeMove(int m){
+  //check if valid
+  if (Board[m]){
+    printf("Error.\n");
+  }
+  //set board
+  Board[m] = -1;
+  //set trace
+  int i;
+  for ( i = 0 ; i < MAG; ++i){
+    if (Trace[i] == -1){
+      Trace[i] = m;
+      break;
+    }
+  }
+}
+
+
+int logicTurn(){
+  int move;
+  srand(time(NULL));
+  move = -1;
+  if ((( Board[0] == -1) && ( Board[6] == -1))&& !Board[3]){
+    move = 3;
+  } else if (((Board[0] == -1) && ( Board[2] == -1 ))&& !Board[1]){
+    move = 1;
+  } else if (((Board[0] == -1) && ( Board[8] == -1))&& !Board[4]){
+    move = 4;
+  } else if (((Board[0] == -1) && ( Board[1] == -1))&& !Board[2]){
+    move = 2;
+  } else if (((Board[0] == -1) && ( Board[3] == -1))&& !Board[6]){
+    move = 6;
+  } else if (((Board[0] == -1) && ( Board[4] == -1))&& !Board[8]){
+    move = 8;
+  } else if (((Board[1] == -1) && ( Board[2] == -1))&& !Board[0]){
+    move = 0;
+  } else if (((Board[1] == -1) && ( Board[4] == -1))&& !Board[7]){
+    move = 7;
+  } else if (((Board[1] == -1) && ( Board[7] == -1))&& !Board[4]){
+    move = 4;
+  } else if (((Board[2] == -1) && ( Board[5] == -1))&& !Board[8]){
+    move = 8;
+  } else if (((Board[2] == -1) && ( Board[8] == -1))&& !Board[5]){
+    move = 5;
+  } else if (((Board[3] == -1) && ( Board[6] == -1))&& !Board[0]){
+    move = 0;
+  } else if (((Board[3] == -1) && ( Board[4] == -1))&& !Board[5]){
+    move = 5;
+  } else if (((Board[3] == -1) && ( Board[5] == -1))&& !Board[4]){
+    move = 4;
+  } else if (((Board[4] == -1) && ( Board[8] == -1))&& !Board[0]){
+    move = 0;
+  } else if (((Board[4] == -1) && ( Board[7] == -1))&& !Board[1]){
+    move = 1;
+  } else if (((Board[4] == -1) && ( Board[6] == -1))&& !Board[2]){
+    move = 2;
+  } else if (((Board[4] == -1) && ( Board[5] == -1))&& !Board[3]){
+    move = 3;
+  } else if (((Board[5] == -1) && ( Board[8] == -1))&& !Board[2]){
+    move = 2;
+  } else if (((Board[6] == -1) && ( Board[7] == -1))&& !Board[8]){
+    move = 8;
+  } else if (((Board[6] == -1) && ( Board[8] == -1))&& !Board[7]){
+    move = 7;
+  } else if (((Board[7] == -1) && ( Board[8] == -1))&& !Board[6]){
+    move = 6;
+  } else if ((( Board[0] == 1) && ( Board[6] == 1)) && !Board[3]){
+    move = 3;
+  } else if (((Board[0] == 1) && ( Board[2] == 1 ))&& !Board[1]){
+    move = 1;
+  } else if (((Board[0] == 1) && ( Board[8] == 1))&& !Board[4]){
+    move = 4;
+  } else if (((Board[0] == 1) && ( Board[1] == 1))&& !Board[2]){
+    move = 2;
+  } else if (((Board[0] == 1) && ( Board[3] == 1))&& !Board[6]){
+    move = 6;
+  } else if (((Board[0] == 1) && ( Board[4] == 1))&& !Board[8]){
+    move = 8;
+  } else if (((Board[1] == 1) && ( Board[2] == 1))&& !Board[0]){
+    move = 0;
+  } else if (((Board[1] == 1) && ( Board[4] == 1))&& !Board[7]){
+    move = 7;
+  } else if (((Board[1] == 1) && ( Board[7] == 1))&& !Board[4]){
+    move = 4;
+  } else if (((Board[2] == 1) && ( Board[5] == 1))&& !Board[8]){
+    move = 8;
+  } else if (((Board[2] == 1) && ( Board[8] == 1))&& !Board[5]){
+    move = 5;
+  } else if (((Board[3] == 1) && ( Board[6] == 1))&& !Board[0]){
+    move = 0;
+  } else if (((Board[3] == 1) && ( Board[4] == 1))&& !Board[5]){
+    move = 5;
+  } else if (((Board[3] == 1) && ( Board[5] == 1))&& !Board[4]){
+    move = 4;
+  } else if (((Board[4] == 1) && ( Board[8] == 1))&& !Board[0]){
+    move = 0;
+  } else if (((Board[4] == 1) && ( Board[7] == 1))&& !Board[1]){
+    move = 1;
+  } else if (((Board[4] == 1) && ( Board[6] == 1))&& !Board[2]){
+    move = 2;
+  } else if (((Board[4] == 1) && ( Board[5] == 1))&& !Board[3]){
+    move = 3;
+  } else if (((Board[5] == 1) && ( Board[8] == 1))&& !Board[2]){
+    move = 2;
+  } else if (((Board[6] == 1) && ( Board[7] == 1))&& !Board[8]){
+    move = 8;
+  } else if (((Board[6] == 1) && ( Board[8] == 1))&& !Board[7]){
+    move = 7;
+  } else if (((Board[7] == 1) && ( Board[8] == 1))&& !Board[6]){
+    move = 6;
+  } else if (!Board[0]){
+    move = 0;
+  } else if (!Board[2]){
+    move = 2;
+  } else if (!Board[4]){
+    move = 4;
+  } else if (!Board[6]){
+    move = 6;
+  } else if (!Board[8]){
+    move = 8;
+  } else {
+    do {
+      move = (rand()%9);
+    } while (Board[move]);
+  }
+  return move;
+}
+
 void move_2(){
   int move;
   move = -1;
@@ -208,6 +384,7 @@ void move_2(){
 }
 
 void move(int p){
+  putchar('1');
   int i,u;
   float max_v,aux;
   int max_i;
@@ -369,6 +546,73 @@ int isWinner_2(int B[]){
   return 0;
 }
 
+int isWinner_2_1(int B[]){
+  if (B[0]){
+    if ((B[0] == B[1]) && ( B[1] == B[2])){
+      if (B[0] == 1){
+	return 1;
+      } else {
+	return 0;
+      }
+    } else if ((B[0] == B[3]) && ( B[3] == B[6])){
+      if (B[0] == 1){
+	return 1;
+      } else {
+	return 0;
+      }
+    } else if ((B[0] == B[4]) && ( B[4] == B[8])){
+      if (B[0] == 1){
+	return 1;
+      } else {
+	return 0;
+      }
+    }
+  }
+  if (B[1]){
+    if ((B[1] == B[4]) && ( B[4] == B[7])){
+      if (B[1] == 1){
+	return 1;
+      } else {
+	return 0;
+      }
+    }
+  }
+  if (B[2]){
+    if (( B[2] == B[4]) && (B[4] == B[6])){
+      if (B[2] == 1){
+	return 1;
+      } else {
+	return 0;
+      }
+    } else if ((B[2] == B[5] ) && (B[5] == B[8])){
+      if (B[2] == 1){
+	return 1;
+      } else {
+	return 0;
+      }
+    }
+  }
+  if (B[3]){
+    if ((B[3] == B[4]) && (B[4] == B[5])){
+      if (B[3] == 1){
+	return 1;
+      } else {
+	return 0;
+      }
+    }
+  }
+  if (B[6]){
+    if ((B[6] == B[7]) && (B[7] == B[8])){
+      if (B[6] == 1){
+	return 1;
+      } else {
+	return 0;
+      }
+    }
+  }
+  return -1;
+}
+
 int isDraw(){
   int i;
   //  printf("draw\n");
@@ -431,8 +675,13 @@ void critic(){
 
 
 float v_hat_2(int b[]){
-  if (isWinner_2(b)){
+  int r;
+  r = isWinner_2_1(b);
+  if ( r == 0){
     return 100.0;
+  } else if (r == 1){
+    printf("here");
+    return -100.0;
   } else if (isDraw_2(b)){
     return 0.0;
   }
@@ -480,7 +729,7 @@ void generalizer(){
     putchar('\n');
   }
   */
-  nu = 0.0001;
+  nu = 0.01;
   /*
   printf("We have reached Generalizer\n");
   printf("Status of BoardHistory\n");
@@ -528,5 +777,6 @@ void generalizer(){
   for (i = 0; i < (2 * MAG) + 1; ++i){
     fprintf(fp,"%f ",Weights[i]);
   }
+  putchar('Z');
   fclose(fp);
 }
