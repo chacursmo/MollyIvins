@@ -34,19 +34,13 @@ float nu;
 int whom;
 
 int main(){
-  putchar('2');
   int logic,learning,dven;
-
   logic = 0;
   learning = 0;
   dven = 0;
-  
   epsilon = 0;
   do {
-    //    printf("a\n");
     experimentGen();
-    //    printf("1\n");
-    //    printf("b\n");
     performanceSys();
     switch(whom){
     case 1:
@@ -61,33 +55,14 @@ int main(){
     default:
       printf("Error in main.\n");
     }
-	
-    //    printBoard();
-	//    printf("c\n");
-    //    printf("2\n");
-    /*
-    printf("After a performance the board looks like\n");
-    int i;
-    for (i = 0; i < MAG; ++i){
-      printf("%d ",Board[i]);
-    }
-
-    putchar('\n');
-    */
-        printBoard();
-        critic();
-    //    printf("d\n");
-    //    printf("3\n");
-        generalizer();
-    //    printf("e\n");
-    //    printf("4\n");
+    printBoard();
+    critic();
+    generalizer();
     epsilon++;
-    //    printf("%d\n",epsilon);
-   } while (epsilon < 3);
+  } while (epsilon < 3);
   printf("ML %d,Logic %d, Draw %d\n",learning,logic,dven);
   return 0;
 }
-
 void printBoard(){
   int i;
     for (i = 0; i < MAG; ++i){
@@ -107,8 +82,6 @@ void printBoard(){
     }
     putchar('\n');
 }
-
-
 void experimentGen(){
   int i,j;
   for ( i = 0; i < MAG; ++i){
@@ -116,7 +89,6 @@ void experimentGen(){
     Trace[i]=-1; //-1 Means nothing has happended yet,
     //Trace is populated by a number zero thru eight representing valid move
   }
-
   for ( i =0; i < MAG; ++i){
     for ( j = 0; j < MAG; ++j){
       BoardHistory[i][j] = 0;
@@ -124,27 +96,17 @@ void experimentGen(){
   }
   FILE *fp;
   fp = fopen("weights.txt","r");
-  
   for ( i = 0; i < (MAG *2) + 1; ++i){
     fscanf(fp,"%f",&Weights[i]);
   }
   fclose(fp);
-  /*  
-  for (i = 0; i < (MAG*2) + 1; ++i){
-    printf("%f ",Weights[i]);
-  }
-  */
-  
 }
 
 void performanceSys(){
-
-
   whom = 0;
   srand(time(NULL));
   int flip,m;
   flip = (rand()%2);
-  
   do {
     if (flip){
       makeMove(logicTurn());
@@ -179,8 +141,6 @@ void performanceSys(){
     }
   } while (1);
  theEnd: return;
-  
-  
 }
 
 void makeMove(int m){
@@ -311,84 +271,11 @@ int logicTurn(){
   return move;
 }
 
-void move_2(){
-  int move;
-  move = -1;
-  if (( Board[0] == 1) && ( Board[6] == 1)){
-    move = 3;
-  } else if ((Board[0] == 1) && ( Board[2] == 1 )){
-    move = 1;
-  } else if ((Board[0] == 1) && ( Board[8] == 1)){
-    move = 4;
-  } else if ((Board[0] == 1) && ( Board[1] == 1)){
-    move = 2;
-  } else if ((Board[0] == 1) && ( Board[3] == 1)){
-    move = 6;
-  } else if ((Board[0] == 1) && ( Board[4] == 1)){
-    move = 8;
-  } else if ((Board[1] == 1) && ( Board[2] == 1)){
-    move = 0;
-  } else if ((Board[1] == 1) && ( Board[4] == 1)){
-    move = 7;
-  } else if ((Board[1] == 1) && ( Board[7] == 1)){
-    move = 4;
-  } else if ((Board[2] == 1) && ( Board[5] == 1)){
-    move = 8;
-  } else if ((Board[2] == 1) && ( Board[8] == 1)){
-    move = 5;
-  } else if ((Board[3] == 1) && ( Board[6] == 1)){
-    move = 0;
-  } else if ((Board[3] == 1) && ( Board[4] == 1)){
-    move = 5;
-  } else if ((Board[3] == 1) && ( Board[5] == 1)){
-    move = 4;
-  } else if ((Board[4] == 1) && ( Board[8] == 1)){
-    move = 0;
-  } else if ((Board[4] == 1) && ( Board[7] == 1)){
-    move = 1;
-  } else if ((Board[4] == 1) && ( Board[6] == 1)){
-    move = 2;
-  } else if ((Board[4] == 1) && ( Board[5] == 1)){
-    move = 3;
-  } else if ((Board[5] == 1) && ( Board[8] == 1)){
-    move = 2;
-  } else if ((Board[6] == 1) && ( Board[7] == 1)){
-    move = 8;
-  } else if ((Board[6] == 1) && ( Board[8] == 1)){
-    move = 7;
-  } else if ((Board[7] == 1) && ( Board[8] == 1)){
-    move = 6;
-  } else if (!Board[0]){
-    move = 0;
-  } else if (!Board[2]){
-    move = 2;
-  } else if (!Board[4]){
-    move = 4;
-  } else if (!Board[6]){
-    move = 6;
-  } else if (!Board[8]){
-    move = 8;
-  }
-  if (move > 0){  
-    Board[move]=1;
-    int u;
-    for (u = 0; u < MAG; ++u){
-      if( Trace[u] == -1 ){
-	Trace[u] = move;
-	break;
-      }
-    }
-  } else {
-    printf("Error in move\n");
-  }
-}
-
 void move(int p){
   putchar('1');
   int i,u;
   float max_v,aux;
   int max_i;
-
   int anyol;
   srand(time(NULL));
   do {
@@ -396,46 +283,16 @@ void move(int p){
   } while (Board[anyol]);
   max_v = v_hat(anyol,p);
   max_i = anyol;
-  
   for (i = 0; i < MAG; ++i){
     if (!Board[i]){
       aux = v_hat(i,p);
-      //           printf("aux:%f ",aux);
       if (max_v < aux){
 	max_v = aux;
 	max_i = i;
-	//	printf("i%d\n",i);
       }
     }
   }
-  //  putchar('\n');
-
-  //  printf("max_i:%d \n",max_i);
-  /*
-        for (i = 0; i < MAG; ++i){
-	printf("%d ",Board[i]);
-
-	}
-  */
-  /*
-	if (max_i > 8){
-	  printf("Error");
-	  max_i = 0;
-	} else if ( max_i < 0 ){
-	  max_i = 0;
-	}
-  */
-  //  	          printf("%d %d\n",p,max_i);
-      //      Board[8] = -1;
-      
-	      //    getchar();
-  /*
-  printf("The Move function has decided for player %d\n",p);
-  printf("The best move to be %d.\n",max_i);
-  */
-  //  printf("max_i: %d \n",max_i);
   Board[max_i]=p;
-  //All subsequent moves are set 
   for (u = 0; u < MAG; ++u){
     if( Trace[u] == -1 ){
       Trace[u] = max_i;
@@ -450,38 +307,8 @@ float v_hat(int m,int p){
   for (i = 0; i < MAG; ++i){
     B[i]=Board[i];
   }
-
   B[m]=p;
-
   return v_hat_2(B);
-
-  /*
-  float V;
-  int i;
-  int len;
-  len = (MAG*2);
-  int X[len];
-  for (i = 0; i < MAG; ++i){
-    if ((Board[i] == 1) || ( (i == m) && (p == 1))){
-      X[i] = 1;
-    } else {
-      X[i]=0;
-    }
-  }
-  
-  for (i = MAG; i < len; ++i){
-    if ((Board[i-MAG] == -1 ) || ( ((i-MAG) == m) && ( p == -1 ))){
-      X[i]=1;
-    } else {
-      X[i]=0;
-    }
-  }
-  V = Weights[0];
-  for (i = 0; i < len; ++i){
-    V+=Weights[i+1]*X[i];
-  }
-  return V;
-  */
 }
 
 int isWinner(){
@@ -615,12 +442,6 @@ int isWinner_2_1(int B[]){
 
 int isDraw(){
   int i;
-  //  printf("draw\n");
-  /*
-  for (i = 0; i < MAG; ++i){
-    printf("%d ",Board[i]);
-  }
-  */
   for (i = 0; i < MAG; ++i){
     if (!Board[i]){
       return 0;
@@ -631,12 +452,6 @@ int isDraw(){
 
 int isDraw_2(int B[]){
   int i;
-  //  printf("draw\n");
-  /*
-  for (i = 0; i < MAG; ++i){
-    printf("%d ",Board[i]);
-  }
-  */
   for (i = 0; i < MAG; ++i){
     if (!B[i]){
       return 0;
@@ -647,15 +462,6 @@ int isDraw_2(int B[]){
 
 void critic(){
   int i,j;
-  /*
-  printf("We have reached the critic\n");
-  printf("Status of game trace\n");
-
-  for ( i = 0; i < MAG; ++i){
-    printf("%d ",Trace[i]);
-  }
-  putchar('\n');
-  */
   for ( i = 0; i < MAG; ++i){
     for (j = 0; j <= i; ++j){
       if (!(j%2)){
@@ -721,55 +527,13 @@ void generalizer(){
       }
     }
   }
-  /*
-  for ( i = 0; i < MAG; ++i){
-    for ( j = 0; j < (MAG * 2) + 1; ++j){
-      printf("%d ",X[i][j]);
-    }
-    putchar('\n');
-  }
-  */
   nu = 0.01;
-  /*
-  printf("We have reached Generalizer\n");
-  printf("Status of BoardHistory\n");
-  for (i = 0; i < MAG; ++i){
-    for (j = 0; j < MAG; ++j){
-      printf("%d ",BoardHistory[i][j]);
-    }
-    putchar('\n');
-  }
-
-  printf("V_train.\n");
-  for (i = 0; i < MAG; ++i){
-    printf("%d ",V_train[i]);
-  }
-  putchar('\n');
-
-  printf("Status of X vector\n");
-  for (i = 0; i < MAG; ++i){
-    for (j = 0;j < (2 * MAG) + 1; ++j){
-      printf("%d ",X[i][j]);
-    }
-    putchar('\n');
-  }
-  */
   for ( j = 0; j < MAG; ++j){
-
     //what if the game doesn't go on for 9 moves?
     for ( k = 0; k < ( 2 * MAG ) + 1; ++k){
-      
       temp = (V_train[j] - v_hat_2(BoardHistory[j])) * X[j][k];
-      //      printf("te: %f \n",temp);
       Weights[k] = Weights[k] + (nu * temp);
-      //      printf("W_k: %f \n",Weights[k]);
     }
-    /*    printf("Weights after %d Loop\n",j+1);
-    for (i = 0; i < (2 * MAG) + 1; ++i){
-      printf("%f ",Weights[i]);
-    }
-    putchar('\n');
-    */
   }
 
   FILE *fp;
