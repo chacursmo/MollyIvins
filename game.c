@@ -8,20 +8,34 @@
 
 //Learning System Functions
 void experimentGen();
+//deprecated
 void performanceSys();
+void performanceSystem2();
 void critic();
 void generalizer();
 
 //Game Play Functions
+
+
+//all deprecated
 void move(int);
 void move_2();
 int isWinner();
 int isDraw();
 float v_hat(int,int);
 float v_hat_2(int []);
-void printBoard();
+
 int logicTurn();
 void makeMove(int);
+
+
+void printBoard();
+void player1move();
+void player2move();
+int gameIsDraw();
+int player1wins();
+int player2wins();
+int boardIndicatesGameOver();
 
 //Global Variables
 int epsilon;
@@ -55,11 +69,11 @@ int main(){
     default:
       printf("Error in main.\n");
     }
-    printBoard();
+    //    printBoard();
     critic();
     generalizer();
     epsilon++;
-  } while (epsilon < 3);
+  } while (epsilon < 1);
   printf("ML %d,Logic %d, Draw %d\n",learning,logic,dven);
   return 0;
 }
@@ -102,11 +116,60 @@ void experimentGen(){
   fclose(fp);
 }
 
+void performaceSystem2(){
+
+  int i;
+  for (i = 0; i < MAG; ++i){
+    player1move();
+    if (boardIndicatesGameOver()){
+      goto endGame;
+    }
+    player2move();
+    if (boardIndicatesGameOver()){
+      goto endGame;
+    }
+  }
+ endGame: return;
+}
+
+int gameIsDraw(){
+  int i;
+  for ( i = 0; i < MAG; ++i){
+    if (!Board[i]){
+      return 0;
+    }
+  }
+  return 1;
+}
+
+int player1wins(){
+  return 1;
+}
+
+int player2wins(){
+  return 1;
+}
+
+int boardIndicatesGameOver(){
+  if (gameIsDraw() || player1wins() || player2wins() ){
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+void player1move(){
+}
+
+void player2move(){
+}
+
 void performanceSys(){
   whom = 0;
   srand(time(NULL));
   int flip,m;
   flip = (rand()%2);
+  flip = 0; //temporary advantage for learner
   do {
     if (flip){
       makeMove(logicTurn());
@@ -272,14 +335,13 @@ int logicTurn(){
 }
 
 void move(int p){
-  putchar('1');
   int i,u;
   float max_v,aux;
   int max_i;
   int anyol;
   srand(time(NULL));
   do {
-  anyol = (rand()%(MAG-1));
+  anyol = (rand()%(MAG));
   } while (Board[anyol]);
   max_v = v_hat(anyol,p);
   max_i = anyol;
@@ -486,7 +548,6 @@ float v_hat_2(int b[]){
   if ( r == 0){
     return 100.0;
   } else if (r == 1){
-    printf("here");
     return -100.0;
   } else if (isDraw_2(b)){
     return 0.0;
@@ -541,6 +602,5 @@ void generalizer(){
   for (i = 0; i < (2 * MAG) + 1; ++i){
     fprintf(fp,"%f ",Weights[i]);
   }
-  putchar('Z');
   fclose(fp);
 }
